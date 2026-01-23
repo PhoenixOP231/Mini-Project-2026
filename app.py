@@ -35,22 +35,30 @@ def load_model():
     num_ftrs = model.fc.in_features
     model.fc = nn.Linear(num_ftrs, 7)
     
-    # --- FIX STARTS HERE ---
     # Get the folder where this app.py file is located
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    # Join it with the model filename
-    model_path = os.path.join(current_dir, "mini_project_2026_model.pth")
-    # -----------------------
+    
+    # Update this line to the NEW filename you uploaded
+    model_path = os.path.join(current_dir, "mini_project_2026_final.pth")
     
     # Load weights
-    model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
-    model.eval()
-    return model
+    try:
+        # Since we used super_reduce, we need to handle the precision
+        model.half() 
+        state_dict = torch.load(model_path, map_location=torch.device('cpu'))
+        model.load_state_dict(state_dict)
+        model.eval()
+        return model
+    except Exception as e:
+        st.error(f"Error loading model: {e}")
+        return None
 
 try:
     model = load_model()
-except FileNotFoundError:
-    st.error("Model file 'mini_project_2026_model.pth' not found. Please run main.py first to train the model!")
+    if model is None:
+        st.stop()
+except Exception as e:
+    st.error(f"Critical Error: {e}")
     st.stop()
 
 # ==========================================
@@ -107,4 +115,5 @@ if uploaded_file is not None:
             st.write("---")
             st.write("**Detailed Probabilities:**")
             probs_dict = {CLASSES[i]: float(probabilities[i]) for i in range(7)}
+
             st.bar_chart(probs_dict)
