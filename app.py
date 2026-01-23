@@ -30,23 +30,22 @@ CLASSES = [
 # ==========================================
 @st.cache_resource
 def load_model():
-    # Initialize the architecture
+    # Initialize architecture
     model = models.resnet18(weights=None)
     num_ftrs = model.fc.in_features
     model.fc = nn.Linear(num_ftrs, 7)
     
-    # Get the folder where this app.py file is located
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    
-    # Update this line to the NEW filename you uploaded
     model_path = os.path.join(current_dir, "mini_project_2026_final.pth")
     
-    # Load weights
     try:
-        # Since we used super_reduce, we need to handle the precision
+        # Load weights into a temporary 16-bit model to match the file
         model.half() 
         state_dict = torch.load(model_path, map_location=torch.device('cpu'))
         model.load_state_dict(state_dict)
+        
+        # CONVERT BACK TO FLOAT32: This stops the RuntimeError on CPU
+        model.float() 
         model.eval()
         return model
     except Exception as e:
@@ -65,13 +64,13 @@ except Exception as e:
 # 3. IMAGE PREPROCESSING
 # ==========================================
 def process_image(image):
-    # Must match the validation transforms from main.py
+    # Standard preprocessing for ResNet18
     preprocess = transforms.Compose([
         transforms.Resize((224, 224)),
         transforms.ToTensor(),
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
     ])
-    return preprocess(image).unsqueeze(0) # Add batch dimension
+    return preprocess(image).unsqueeze(0)
 
 # ==========================================
 # 4. USER INTERFACE (UI)
@@ -117,3 +116,4 @@ if uploaded_file is not None:
             probs_dict = {CLASSES[i]: float(probabilities[i]) for i in range(7)}
 
             st.bar_chart(probs_dict)
+
