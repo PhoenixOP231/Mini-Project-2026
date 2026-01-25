@@ -106,9 +106,16 @@ if uploaded_file is not None:
                 probabilities = torch.nn.functional.softmax(outputs[0], dim=0)
                 confidence, predicted_class = torch.max(probabilities, 0)
             
-            # Show Result
-            st.success(f"**Prediction:** {CLASSES[predicted_class.item()]}")
-            st.metric(label="Confidence Score", value=f"{confidence.item()*100:.2f}%")
+            # Show Result with Confidence Threshold
+            threshold = 0.60  # You can adjust this (0.60 = 60%)
+            
+            if confidence.item() < threshold:
+                st.warning(f"⚠️ Low Confidence ({confidence.item()*100:.2f}%).")
+                st.write(f"The model thinks this is **{CLASSES[predicted_class.item()]}**, but is not sure.")
+                st.info("Recommendation: Consult a dermatologist for a closer look.")
+            else:
+                st.success(f"**Prediction:** {CLASSES[predicted_class.item()]}")
+                st.metric(label="Confidence Score", value=f"{confidence.item()*100:.2f}%")
             
             # Show probability chart
             st.write("---")
