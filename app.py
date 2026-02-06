@@ -21,7 +21,7 @@ st.set_page_config(
 # 2. GEMINI AI CONFIGURATION
 # ==========================================
 # ⚠️ REPLACE THIS WITH YOUR REAL API KEY
-GOOGLE_API_KEY = "AIzaSyAoEoKeoWBg1gb_FkJQMP9Y-1Q4NV2OLWw"
+GOOGLE_API_KEY = "API KEY GOES HERE"
 
 # Setup the AI Model
 try:
@@ -278,7 +278,7 @@ else:
 # ==========================================
 st.markdown("---")
 st.subheader("💬 AI Medical Assistant")
-st.caption("Powered by Google Gemini Pro - Ask anything!")
+# st.caption("Powered by Google Gemini Pro - Ask anything!")
 
 # Initialize Chat History
 if "messages" not in st.session_state:
